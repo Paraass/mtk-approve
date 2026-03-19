@@ -36,7 +36,6 @@
       overflow-x: hidden;
     }
 
-    /* background grid */
     body::before {
       content: '';
       position: fixed;
@@ -165,12 +164,6 @@
       color: var(--muted);
     }
 
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 24px 0;
-    }
-
     .btn {
       width: 100%;
       padding: 14px;
@@ -289,6 +282,18 @@
       border-radius: 4px;
       margin-bottom: 24px;
     }
+
+    .built-by {
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 24px;
+    }
+
+    .built-by span {
+      color: var(--blue);
+    }
   </style>
 </head>
 <body>
@@ -335,6 +340,8 @@
       <div class="status-dot" id="statusDot"></div>
       <span id="statusText">Connect your wallet to get started.</span>
     </div>
+
+    <p class="built-by">Built by <span>Paras Aggarwal</span></p>
   </div>
 
   <script>
