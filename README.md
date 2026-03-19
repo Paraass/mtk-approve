@@ -17,7 +17,7 @@
 
 ## 📌 Project Overview
 
-This project was built for a real client (Veer Singh) who needed a working ERC-20 token deployment with a frontend DApp that allows users to approve token spending via Trust Wallet.
+This project was built for a real client who needed a working ERC-20 token deployment with a frontend DApp that allows users to approve token spending via Trust Wallet.
 
 **The complete flow:**
 ```
