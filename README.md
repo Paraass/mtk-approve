@@ -1,4 +1,4 @@
-# ERC-20 Token Approval DApp — MyToken (MTK)
+# ERC-20 Token Approval DApp - MyToken (MTK)
 
 > Built for a real client as a freelance blockchain project.  
 > Deployed on **Ethereum Mainnet** · Live DApp hosted on GitHub Pages
@@ -28,14 +28,14 @@ Smart Contract Deployed → QR Code Generated → User Scans with Trust Wallet �
 
 ## 🛠️ What Was Built
 
-### 1. Smart Contract — `MyToken.sol`
+### 1. Smart Contract - `MyToken.sol`
 - Full ERC-20 standard implementation written in Solidity
 - Includes `approve()`, `transferFrom()`, `transfer()`, `balanceOf()`, `allowance()`
 - Emits `Transfer` and `Approval` events
 - 1,000,000 MTK minted to deployer on launch
 - Deployed on Ethereum Mainnet via Remix IDE + Trust Wallet (WalletConnect)
 
-### 2. Frontend DApp — `approve-dapp.html`
+### 2. Frontend DApp - `approve-dapp.html`
 - Single-file HTML/CSS/JS DApp
 - Connects to MetaMask and Trust Wallet via `window.ethereum`
 - Calls the `approve()` function on the deployed contract
