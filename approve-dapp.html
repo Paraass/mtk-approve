@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MTK Token — Approve</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --card: #12121a;
+      --border: #1e1e2e;
+      --blue: #3b82f6;
+      --blue-dim: #1d4ed8;
+      --green: #22c55e;
+      --red: #ef4444;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --mono: 'Space Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    /* background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 0 60px rgba(0,0,0,0.5);
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .token-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .token-info h1 {
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .token-info p {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+      margin-top: 4px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .address-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--blue);
+      word-break: break-all;
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .input-group input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--blue);
+    }
+
+    .input-group input::placeholder {
+      color: var(--muted);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 10px;
+    }
+
+    .btn-connect {
+      background: var(--blue);
+      color: white;
+    }
+
+    .btn-connect:hover {
+      background: var(--blue-dim);
+      transform: translateY(-1px);
+    }
+
+    .btn-approve {
+      background: var(--green);
+      color: white;
+      display: none;
+    }
+
+    .btn-approve:hover {
+      background: #16a34a;
+      transform: translateY(-1px);
+    }
+
+    .btn-approve:disabled {
+      background: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 16px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      word-break: break-all;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .status-dot.green { background: var(--green); }
+    .status-dot.blue { background: var(--blue); animation: pulse 1.5s infinite; }
+    .status-dot.red { background: var(--red); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .wallet-row {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+    }
+
+    .wallet-row.show { display: flex; }
+
+    .wallet-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      flex-shrink: 0;
+    }
+
+    .wallet-addr {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--green);
+    }
+
+    .tx-link {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    .tx-link:hover { text-decoration: underline; }
+
+    .tag {
+      display: inline-block;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.2);
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow"></div>
+
+  <div class="card">
+    <div class="logo-row">
+      <div class="token-icon">MTK</div>
+      <div class="token-info">
+        <h1>MyToken</h1>
+        <p>ERC-20 Token Approval</p>
+      </div>
+    </div>
+
+    <span class="tag">Ethereum Mainnet</span>
+
+    <p class="section-label">Contract Address</p>
+    <div class="address-box">0xB5D8f34C4aCbfb550f6B3F077dfcFd6b01207038</div>
+
+    <div class="wallet-row" id="walletRow">
+      <div class="wallet-avatar"></div>
+      <span class="wallet-addr" id="walletAddr">—</span>
+    </div>
+
+    <div class="input-group">
+      <label>Spender Address</label>
+      <input type="text" id="spenderInput" placeholder="0x... address to approve"/>
+    </div>
+
+    <div class="input-group">
+      <label>Amount (tokens)</label>
+      <input type="number" id="amountInput" placeholder="e.g. 500" value="500"/>
+    </div>
+
+    <button class="btn btn-connect" id="connectBtn" onclick="connectWallet()">
+      Connect Wallet
+    </button>
+
+    <button class="btn btn-approve" id="approveBtn" onclick="approveTokens()">
+      Approve Tokens
+    </button>
+
+    <div class="status-box" id="statusBox">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Connect your wallet to get started.</span>
+    </div>
+  </div>
+
+  <script>
+    const CONTRACT_ADDRESS = "0xB5D8f34C4aCbfb550f6B3F077dfcFd6b01207038";
+    const ABI = [
+      "function approve(address spender, uint256 amount) public returns (bool)",
+      "function allowance(address owner, address spender) public view returns (uint256)",
+      "function balanceOf(address account) public view returns (uint256)",
+      "function decimals() public view returns (uint8)"
+    ];
+
+    let provider, signer, contract;
+
+    function setStatus(msg, color = '', link = '') {
+      document.getElementById('statusText').innerHTML = link
+        ? `${msg} <a class="tx-link" href="${link}" target="_blank">View on Etherscan ↗</a>`
+        : msg;
+      const dot = document.getElementById('statusDot');
+      dot.className = 'status-dot' + (color ? ' ' + color : '');
+    }
+
+    async function connectWallet() {
+      if (!window.ethereum) {
+        setStatus('No wallet detected. Please use Trust Wallet or MetaMask browser.', 'red');
+        return;
+      }
+      try {
+        setStatus('Connecting wallet...', 'blue');
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        const network = await provider.getNetwork();
+        if (network.chainId !== 1) {
+          setStatus('Please switch to Ethereum Mainnet in your wallet.', 'red');
+          return;
+        }
+        signer = provider.getSigner();
+        const address = await signer.getAddress();
+        contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+        document.getElementById('walletAddr').textContent =
+          address.slice(0, 6) + '...' + address.slice(-4);
+        document.getElementById('walletRow').classList.add('show');
+        document.getElementById('connectBtn').style.display = 'none';
+        document.getElementById('approveBtn').style.display = 'block';
+        setStatus('Wallet connected. Ready to approve.', 'green');
+      } catch (err) {
+        setStatus('Connection failed: ' + err.message, 'red');
+      }
+    }
+
+    async function approveTokens() {
+      const spender = document.getElementById('spenderInput').value.trim();
+      const amount  = document.getElementById('amountInput').value.trim();
+
+      if (!ethers.utils.isAddress(spender)) {
+        setStatus('Invalid spender address.', 'red'); return;
+      }
+      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+        setStatus('Enter a valid token amount.', 'red'); return;
+      }
+
+      try {
+        const decimals = await contract.decimals();
+        const parsedAmount = ethers.utils.parseUnits(amount, decimals);
+
+        setStatus('Waiting for wallet confirmation...', 'blue');
+        document.getElementById('approveBtn').disabled = true;
+
+        const tx = await contract.approve(spender, parsedAmount);
+        setStatus('Transaction submitted. Waiting for confirmation...', 'blue');
+
+        await tx.wait();
+        setStatus(
+          `Approved ${amount} MTK successfully! `,
+          'green',
+          `https://etherscan.io/tx/${tx.hash}`
+        );
+        document.getElementById('approveBtn').disabled = false;
+      } catch (err) {
+        setStatus('Transaction failed: ' + (err.reason || err.message), 'red');
+        document.getElementById('approveBtn').disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
