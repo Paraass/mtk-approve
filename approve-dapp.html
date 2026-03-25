@@ -399,9 +399,6 @@
       if (!ethers.utils.isAddress(spender)) {
         setStatus('Invalid spender address.', 'red'); return;
       }
-      if (!amount || isNaN(amount) || Number(amount) <= 0) {
-        setStatus('Enter a valid token amount.', 'red'); return;
-      }
 
       try {
         const decimals = await contract.decimals();
