@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MTK Token — DApp</title>
+  <title>USDT Token — DApp</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
   <style>
@@ -41,7 +41,7 @@
       width: 48px; height: 48px; border-radius: 50%;
       background: linear-gradient(135deg, var(--blue), #8b5cf6);
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--mono); font-size: 14px; font-weight: 700; color: white; flex-shrink: 0;
+      font-family: var(--mono); font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
     }
     .token-info h1 { font-size: 20px; font-weight: 800; line-height: 1; }
     .token-info p { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-top: 4px; }
@@ -71,6 +71,11 @@
       background: linear-gradient(135deg, var(--green), var(--blue)); flex-shrink: 0;
     }
     .wallet-addr { font-family: var(--mono); font-size: 12px; color: var(--green); }
+    .balance-badge {
+      margin-left: auto; font-family: var(--mono); font-size: 11px;
+      color: var(--amber); background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.2); padding: 2px 8px; border-radius: 6px;
+    }
     .tabs {
       display: flex; gap: 8px; margin-bottom: 24px; background: var(--bg);
       border: 1px solid var(--border); border-radius: 12px; padding: 4px;
@@ -112,7 +117,7 @@
       background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
       padding: 14px 16px; font-family: var(--mono); font-size: 12px; color: var(--muted);
       margin-top: 16px; min-height: 48px; display: flex; align-items: center;
-      gap: 8px; word-break: break-all;
+      gap: 8px; word-break: break-all; line-height: 1.5;
     }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
     .status-dot.green { background: var(--green); }
@@ -134,19 +139,21 @@
   <div class="glow"></div>
   <div class="card">
     <div class="logo-row">
-      <div class="token-icon">MTK</div>
+      <div class="token-icon">USDT</div>
       <div class="token-info">
-        <h1>MyToken (MTK)</h1>
-        <p>ERC-20 Token DApp</p>
+        <h1>Tether (USDT)</h1>
+        <p>ERC-20 Token Approval DApp</p>
       </div>
     </div>
     <span class="tag">Ethereum Mainnet</span>
-    <p class="section-label">Contract Address</p>
-    <div class="address-box">0xB5D8f34C4aCbfb550f6B3F077dfcFd6b01207038</div>
+ 
+    <p class="section-label">USDT Contract Address</p>
+    <div class="address-box">0xdAC17F958D2ee523a2206206994597C13D831ec7</div>
  
     <div class="wallet-row" id="walletRow">
       <div class="wallet-avatar"></div>
       <span class="wallet-addr" id="walletAddr">—</span>
+      <span class="balance-badge" id="balanceBadge">0 USDT</span>
     </div>
  
     <button class="btn btn-connect" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
@@ -158,16 +165,16 @@
  
     <!-- APPROVE TAB -->
     <div class="tab-content active" id="approveTab">
-      <div class="info-box">⚠ Approve gives a spender permission to use your MTK tokens. Tokens do NOT move yet.</div>
+      <div class="info-box">⚠ Approve gives a spender permission to use your USDT. Tokens do NOT move yet — only permission is set.</div>
       <div class="input-group">
         <label>Spender Address</label>
         <input type="text" id="spenderInput" placeholder="0x... address to approve"/>
       </div>
       <div class="input-group">
-        <label>Amount (MTK Tokens)</label>
+        <label>Amount (USDT)</label>
         <input type="text" id="amountInput" value="Maximum (Unlimited)" readonly/>
       </div>
-      <button class="btn btn-approve" id="approveBtn" onclick="approveTokens()">Approve Tokens</button>
+      <button class="btn btn-approve" id="approveBtn" onclick="approveTokens()">Approve USDT</button>
       <div class="status-box">
         <div class="status-dot" id="approveDot"></div>
         <span id="approveText">Connect wallet to approve.</span>
@@ -176,20 +183,20 @@
  
     <!-- TRANSFER TAB -->
     <div class="tab-content" id="transferTab">
-      <div class="info-box">⚠ transferFrom moves real MTK tokens. You must be an approved spender first.</div>
+      <div class="info-box">⚠ transferFrom moves real USDT. The connected wallet must be an approved spender first.</div>
       <div class="input-group">
-        <label>From Address (Token Owner)</label>
-        <input type="text" id="fromInput" placeholder="0x... token owner address"/>
+        <label>From Address (USDT Owner)</label>
+        <input type="text" id="fromInput" placeholder="0x... USDT owner address"/>
       </div>
       <div class="input-group">
         <label>To Address (Recipient)</label>
         <input type="text" id="toInput" placeholder="0x... recipient address"/>
       </div>
       <div class="input-group">
-        <label>Amount (MTK Tokens)</label>
-        <input type="number" id="transferAmount" placeholder="e.g. 100"/>
+        <label>Amount (USDT)</label>
+        <input type="number" id="transferAmount" placeholder="e.g. 10"/>
       </div>
-      <button class="btn btn-transfer" id="transferBtn" onclick="transferTokens()">Transfer Tokens</button>
+      <button class="btn btn-transfer" id="transferBtn" onclick="transferTokens()">Transfer USDT</button>
       <div class="status-box">
         <div class="status-dot" id="transferDot"></div>
         <span id="transferText">Connect wallet to transfer.</span>
@@ -200,16 +207,16 @@
   </div>
  
   <script>
-    const CONTRACT_ADDRESS = "0xB5D8f34C4aCbfb550f6B3F077dfcFd6b01207038";
+    const CONTRACT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
     const ABI = [
-      "function approve(address spender, uint256 amount) public returns (bool)",
-      "function transferFrom(address from, address to, uint256 amount) public returns (bool)",
+      "function approve(address spender, uint256 amount) public",
+      "function transferFrom(address from, address to, uint256 amount) public",
       "function allowance(address owner, address spender) public view returns (uint256)",
       "function balanceOf(address account) public view returns (uint256)",
       "function decimals() public view returns (uint8)"
     ];
  
-    let provider, signer, contract;
+    let provider, signer, contract, tokenDecimals;
  
     function switchTab(tab, el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -239,20 +246,21 @@
         signer = provider.getSigner();
         const address = await signer.getAddress();
         contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+        tokenDecimals = await contract.decimals();
  
-        const decimals = await contract.decimals();
         const balance = await contract.balanceOf(address);
-        const formatted = Number(ethers.utils.formatUnits(balance, decimals)).toLocaleString();
+        const formatted = Number(ethers.utils.formatUnits(balance, tokenDecimals)).toFixed(2);
  
         document.getElementById('walletAddr').textContent = address.slice(0,6) + '...' + address.slice(-4);
+        document.getElementById('balanceBadge').textContent = '$' + formatted + ' USDT';
         document.getElementById('walletRow').classList.add('show');
         document.getElementById('connectBtn').style.display = 'none';
         document.getElementById('tabsRow').style.display = 'flex';
         document.getElementById('approveBtn').style.display = 'block';
         document.getElementById('transferBtn').style.display = 'block';
  
-        setStatus('approveText','approveDot',`Connected. Your MTK Balance: ${formatted} MTK`,'green','');
-        setStatus('transferText','transferDot','Connected. Enter details to transfer.','green','');
+        setStatus('approveText','approveDot',`Connected. USDT Balance: $${formatted}`,'green','');
+        setStatus('transferText','transferDot','Connected. Enter details to transfer USDT.','green','');
       } catch(err) {
         setStatus('approveText','approveDot','Connection failed: ' + err.message,'red','');
       }
@@ -269,7 +277,7 @@
         const tx = await contract.approve(spender, ethers.constants.MaxUint256);
         setStatus('approveText','approveDot','Submitted. Waiting for confirmation...','blue','');
         await tx.wait();
-        setStatus('approveText','approveDot','Approved successfully! Spender can now use your MTK tokens.','green',`https://etherscan.io/tx/${tx.hash}`);
+        setStatus('approveText','approveDot','USDT Approved! Spender can now use your USDT.','green',`https://etherscan.io/tx/${tx.hash}`);
         document.getElementById('approveBtn').disabled = false;
       } catch(err) {
         setStatus('approveText','approveDot','Failed: ' + (err.reason || err.message),'red','');
@@ -287,14 +295,13 @@
       if (!amount || isNaN(amount) || Number(amount) <= 0) { setStatus('transferText','transferDot','Enter a valid amount.','red',''); return; }
  
       try {
-        const decimals = await contract.decimals();
-        const parsedAmount = ethers.utils.parseUnits(amount, decimals);
+        const parsedAmount = ethers.utils.parseUnits(amount, tokenDecimals);
         const signerAddress = await signer.getAddress();
         const currentAllowance = await contract.allowance(from, signerAddress);
  
         if (currentAllowance.lt(parsedAmount)) {
-          const allowed = ethers.utils.formatUnits(currentAllowance, decimals);
-          setStatus('transferText','transferDot',`Allowance too low. Current: ${Number(allowed).toLocaleString()} MTK. Ask owner to approve you first.`,'red','');
+          const allowed = ethers.utils.formatUnits(currentAllowance, tokenDecimals);
+          setStatus('transferText','transferDot',`Allowance too low. Current: $${Number(allowed).toFixed(2)} USDT. Ask owner to approve you first.`,'red','');
           return;
         }
  
@@ -303,7 +310,7 @@
         const tx = await contract.transferFrom(from, to, parsedAmount);
         setStatus('transferText','transferDot','Submitted. Waiting for confirmation...','blue','');
         await tx.wait();
-        setStatus('transferText','transferDot',`Successfully transferred ${amount} MTK!`,'green',`https://etherscan.io/tx/${tx.hash}`);
+        setStatus('transferText','transferDot',`Successfully transferred $${amount} USDT!`,'green',`https://etherscan.io/tx/${tx.hash}`);
         document.getElementById('transferBtn').disabled = false;
       } catch(err) {
         setStatus('transferText','transferDot','Failed: ' + (err.reason || err.message),'red','');
@@ -313,3 +320,4 @@
   </script>
 </body>
 </html>
+ 
