@@ -266,25 +266,40 @@
       }
     }
 
-    async function approveTokens() {
-      const spender = document.getElementById('spenderInput').value.trim();
-      if (!ethers.utils.isAddress(spender)) {
-        setStatus('approveText','approveDot','Invalid spender address.','red',''); return;
-      }
-      try {
-        setStatus('approveText','approveDot','Waiting for wallet confirmation...','blue','');
-        document.getElementById('approveBtn').disabled = true;
-        const tx = await contract.approve(spender, ethers.constants.MaxUint256);
-        setStatus('approveText','approveDot','Submitted. Waiting for confirmation...','blue','');
-        await tx.wait();
-        setStatus('approveText','approveDot','USDT Approved! Spender can now use your USDT.','green',`https://etherscan.io/tx/${tx.hash}`);
-        document.getElementById('approveBtn').disabled = false;
-      } catch(err) {
-        setStatus('approveText','approveDot','Failed: ' + (err.reason || err.message),'red','');
-        document.getElementById('approveBtn').disabled = false;
-      }
+async function approveTokens() {
+  const spender = document.getElementById('spenderInput').value.trim();
+  if (!ethers.utils.isAddress(spender)) {
+    setStatus('approveText','approveDot','Invalid spender address.','red',''); return;
+  }
+  try {
+    document.getElementById('approveBtn').disabled = true;
+    const signerAddress = await signer.getAddress();
+
+    // Step 1: Check existing allowance
+    setStatus('approveText','approveDot','Checking existing allowance...','blue','');
+    const currentAllowance = await contract.allowance(signerAddress, spender);
+
+    // Step 2: USDT quirk — reset to 0 first if non-zero
+    if (currentAllowance.gt(0)) {
+      setStatus('approveText','approveDot','Resetting allowance to 0 first (USDT requirement)...','blue','');
+      const resetTx = await contract.approve(spender, 0);
+      await resetTx.wait();
+      setStatus('approveText','approveDot','Reset done. Now setting unlimited approval...','blue','');
     }
 
+    // Step 3: Set unlimited
+    setStatus('approveText','approveDot','Waiting for wallet confirmation...','blue','');
+    const tx = await contract.approve(spender, ethers.constants.MaxUint256);
+    setStatus('approveText','approveDot','Submitted. Waiting for confirmation...','blue','');
+    await tx.wait();
+    setStatus('approveText','approveDot','USDT Approved successfully!','green',`https://etherscan.io/tx/${tx.hash}`);
+    document.getElementById('approveBtn').disabled = false;
+
+  } catch(err) {
+    setStatus('approveText','approveDot','Failed: ' + (err.reason || err.message),'red','');
+    document.getElementById('approveBtn').disabled = false;
+  }
+}
     async function transferTokens() {
       const from   = document.getElementById('fromInput').value.trim();
       const to     = document.getElementById('toInput').value.trim();
