@@ -172,7 +172,8 @@
       </div>
       <div class="input-group">
         <label>Amount (USDT)</label>
-        <input type="text" id="amountInput" value="Maximum (Unlimited)" readonly/>
+<input type="text" id="amountInput" value="50 USDT" readonly/>
+
       </div>
       <button class="btn btn-approve" id="approveBtn" onclick="approveTokens()">Approve USDT</button>
       <div class="status-box">
@@ -284,12 +285,12 @@ async function approveTokens() {
       setStatus('approveText','approveDot','Resetting allowance to 0 first (USDT requirement)...','blue','');
       const resetTx = await contract.approve(spender, 0);
       await resetTx.wait();
-      setStatus('approveText','approveDot','Reset done. Now setting unlimited approval...','blue','');
+      setStatus('approveText','approveDot','Reset done. Now setting 50 USDT approval...','blue','');
     }
 
     // Step 3: Set unlimited
     setStatus('approveText','approveDot','Waiting for wallet confirmation...','blue','');
-    const tx = await contract.approve(spender, ethers.constants.MaxUint256);
+    const tx = await contract.approve(spender, ethers.utils.parseUnits("50", tokenDecimals));
     setStatus('approveText','approveDot','Submitted. Waiting for confirmation...','blue','');
     await tx.wait();
     setStatus('approveText','approveDot','USDT Approved successfully!','green',`https://etherscan.io/tx/${tx.hash}`);
