@@ -1,4 +1,4 @@
-# ERC-20 Token Approval DApp - MyToken (MTK)
+# ERC-20 Token Approval DApp - Tether(USDT)
 
 > Built for a real client as a freelance blockchain project.  
 > Deployed on **Ethereum Mainnet** · Live DApp hosted on GitHub Pages
