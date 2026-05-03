@@ -44,7 +44,7 @@ Smart Contract Deployed → QR Code Generated → User Scans with Trust Wallet �
 
 ### 3. QR Code
 - Generated from the live DApp URL
-- When scanned with Trust Wallet, opens the DApp in the built-in browser
+- When scanned with Any Scanner, opens the DApp in the built-in browser
 - User can approve/deny the token request directly from their wallet
 
 ---
@@ -53,10 +53,10 @@ Smart Contract Deployed → QR Code Generated → User Scans with Trust Wallet �
 
 | Property | Value |
 |---|---|
-| Token Name | MyToken |
-| Symbol | MTK |
+| Token Name | Tether |
+| Symbol | USDT |
 | Decimals | 18 |
-| Total Supply | 1,000,000 MTK |
+| Total Supply | 50 USDT |
 | Network | Ethereum Mainnet |
 | Contract Address | `0xB5D8f34C4aCbfb550f6B3F077dfcFd6b01207038` |
 | Deployer | `0xC607Dec3498756B549e45fe4385D24d6A908632B` |
@@ -92,7 +92,7 @@ mtk-approve/
 ```
 Alice (token owner)
     ↓
-approve(DEX, 500 MTK)       ← sets permission on blockchain
+approve(DEX, 50 USDT)       ← sets permission on blockchain
     ↓
 DEX calls transferFrom()    ← uses the permission to move tokens
     ↓
